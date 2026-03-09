@@ -1,0 +1,99 @@
+{
+  "id": "root",
+  "label": "Does the patient present with acute neurological deficit?",
+  "type": "decision",
+  "children": [
+    {
+      "id": "onset",
+      "label": "Is the time of symptom onset known and within 4.5 hours?",
+      "type": "decision",
+      "edgeLabel": "YES",
+      "children": [
+        {
+          "id": "ct_bleed",
+          "label": "Does non-contrast CT head show intracranial hemorrhage?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            {
+              "id": "hemorrhagic",
+              "label": "Is the patient on anticoagulant therapy?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "reverse_anticoag", "label": "Urgent Reversal Agent and Neurosurgical Consult", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "bp_management", "label": "ICU Admission with Aggressive BP Management", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "ischemic",
+              "label": "Are there contraindications to IV alteplase?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                {
+                  "id": "tpa_contraindicated",
+                  "label": "Is large vessel occlusion suspected? (NIHSS ≥ 6)",
+                  "type": "decision",
+                  "edgeLabel": "YES",
+                  "children": [
+                    { "id": "thrombectomy_only", "label": "Emergent CT Angiography and Mechanical Thrombectomy", "type": "leaf", "edgeLabel": "YES" },
+                    { "id": "supportive", "label": "Admit to Stroke Unit for Supportive Care", "type": "leaf", "edgeLabel": "NO" }
+                  ]
+                },
+                {
+                  "id": "tpa_eligible",
+                  "label": "Administer IV Alteplase. Is NIHSS ≥ 6?",
+                  "type": "decision",
+                  "edgeLabel": "NO",
+                  "children": [
+                    { "id": "tpa_plus_thrombectomy", "label": "CT Angiography for Possible Mechanical Thrombectomy", "type": "leaf", "edgeLabel": "YES" },
+                    { "id": "tpa_alone", "label": "Monitor in Stroke Unit Post-Thrombolysis", "type": "leaf", "edgeLabel": "NO" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "late_window",
+          "label": "Is onset 4.5–24 hours with salvageable penumbra on perfusion imaging?",
+          "type": "decision",
+          "edgeLabel": "NO",
+          "children": [
+            {
+              "id": "penumbra",
+              "label": "Is large vessel occlusion confirmed on CTA?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "late_thrombectomy", "label": "Mechanical Thrombectomy (Extended Window)", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "medical_mgmt", "label": "Medical Management and Stroke Unit Admission", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            { "id": "no_intervention", "label": "Admit to Stroke Unit: Secondary Prevention Workup", "type": "leaf", "edgeLabel": "NO" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mimic",
+      "label": "Are features consistent with a stroke mimic?",
+      "type": "decision",
+      "edgeLabel": "NO",
+      "children": [
+        {
+          "id": "mimic_yes",
+          "label": "Does blood glucose suggest hypoglycaemia?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            { "id": "hypo", "label": "Administer IV Dextrose and Reassess", "type": "leaf", "edgeLabel": "YES" },
+            { "id": "other_mimic", "label": "Investigate Alternative Diagnosis (Migraine, Seizure, Conversion)", "type": "leaf", "edgeLabel": "NO" }
+          ]
+        },
+        { "id": "tia", "label": "Assess for TIA: ABCD2 Score and Urgent Neurology Referral", "type": "leaf", "edgeLabel": "NO" }
+      ]
+    }
+  ]
+}

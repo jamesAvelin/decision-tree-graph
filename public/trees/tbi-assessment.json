@@ -1,0 +1,126 @@
+{
+  "id": "root",
+  "label": "Does the patient present with suspected head trauma?",
+  "type": "decision",
+  "children": [
+    {
+      "id": "gcs_assess",
+      "label": "What is the Glasgow Coma Scale (GCS) score?",
+      "type": "decision",
+      "edgeLabel": "YES",
+      "children": [
+        {
+          "id": "severe_tbi",
+          "label": "Is the patient hemodynamically stable?",
+          "type": "decision",
+          "edgeLabel": "GCS ≤ 8",
+          "children": [
+            {
+              "id": "stable_severe",
+              "label": "Are there signs of intracranial hemorrhage on CT?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "ich_yes", "label": "Emergent Neurosurgical Intervention Required", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "ich_no", "label": "ICU Admission with ICP Monitoring Protocol", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "unstable_severe",
+              "label": "Is there evidence of active hemorrhage source?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "active_bleed", "label": "Initiate Damage Control Resuscitation", "type": "chance", "edgeLabel": "YES" },
+                { "id": "no_bleed", "label": "Volume Resuscitate and Obtain CT Head", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "moderate_mild",
+          "label": "Are there any high-risk clinical features present?",
+          "type": "decision",
+          "edgeLabel": "GCS 9-15",
+          "children": [
+            {
+              "id": "high_risk_yes",
+              "label": "Does CT head scan show abnormal findings?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "abnormal_ct", "label": "Neurosurgical Consult and ICU Admission", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "normal_ct", "label": "Admit for Neurological Observation (q1h checks)", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "high_risk_no",
+              "label": "Is there post-traumatic amnesia exceeding 30 minutes?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "amnesia_yes", "label": "Extended Observation with Delayed CT if Symptoms Persist", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "amnesia_no", "label": "Safe for Discharge with Head Injury Advice Sheet", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "no_trauma",
+      "label": "Is there loss of consciousness or persistent symptoms?",
+      "type": "decision",
+      "edgeLabel": "NO",
+      "children": [
+        {
+          "id": "loc_yes",
+          "label": "Does SCAT5 concussion assessment indicate abnormality?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            {
+              "id": "scat_abnormal",
+              "label": "Is there a focal neurological deficit on examination?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "focal_deficit", "label": "Urgent CT Scan and Neurology Referral", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "no_focal", "label": "Structured Concussion Management Protocol", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "scat_normal",
+              "label": "Are symptoms resolving within 15 minutes?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "resolving", "label": "Gradual Return-to-Activity Protocol", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "not_resolving", "label": "Extended Monitoring and Follow-Up Clinic Referral", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "loc_no",
+          "label": "Has the patient been on anticoagulant therapy?",
+          "type": "decision",
+          "edgeLabel": "NO",
+          "children": [
+            { "id": "anticoag_yes", "label": "CT Head Scan and Coagulation Studies Required", "type": "leaf", "edgeLabel": "YES" },
+            {
+              "id": "anticoag_no",
+              "label": "Is the patient age 65 or older?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "elderly", "label": "Lower Threshold for CT: Consider Imaging", "type": "chance", "edgeLabel": "YES" },
+                { "id": "young", "label": "Continue Standard Trauma Assessment Protocol", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

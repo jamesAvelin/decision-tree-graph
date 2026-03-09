@@ -1,0 +1,43 @@
+{
+  "nodes": [
+    { "id": "root", "label": "Is the credit score above 700?", "type": "decision" },
+    { "id": "high_credit", "label": "Is the annual income greater than $80,000?", "type": "decision" },
+    { "id": "low_credit", "label": "Is the credit score above 600?", "type": "decision" },
+    { "id": "high_income", "label": "Is the debt-to-income ratio below 30%?", "type": "decision" },
+    { "id": "low_income", "label": "Is the applicant an existing customer?", "type": "decision" },
+    { "id": "low_dti", "label": "Has the applicant been employed for more than 2 years?", "type": "decision" },
+    { "id": "high_dti", "label": "Does the applicant have assets exceeding $50,000?", "type": "decision" },
+    { "id": "approve_premium", "label": "Approve: Premium Rate (3.2%)", "type": "leaf" },
+    { "id": "approve_standard", "label": "Approve: Standard Rate (4.1%)", "type": "leaf" },
+    { "id": "approve_conditional", "label": "Approve: Conditional (5.5%)", "type": "leaf" },
+    { "id": "manual_review", "label": "Escalate to Manual Review", "type": "chance" },
+    { "id": "existing_yes", "label": "Approve: Loyalty Rate (4.5%)", "type": "leaf" },
+    { "id": "existing_no", "label": "Decline Application", "type": "leaf" },
+    { "id": "mid_credit", "label": "Is collateral available for the loan?", "type": "decision" },
+    { "id": "very_low", "label": "Has the applicant filed for bankruptcy?", "type": "decision" },
+    { "id": "collateral_yes", "label": "Approve: Secured Rate (5.8%)", "type": "leaf" },
+    { "id": "collateral_no", "label": "Decline Application", "type": "leaf" },
+    { "id": "bankrupt", "label": "Decline: High Risk", "type": "leaf" },
+    { "id": "no_bankrupt", "label": "Offer: Secured Credit Card ($500 limit)", "type": "leaf" }
+  ],
+  "edges": [
+    { "source": "root", "target": "high_credit", "label": "YES" },
+    { "source": "root", "target": "low_credit", "label": "NO" },
+    { "source": "high_credit", "target": "high_income", "label": "YES" },
+    { "source": "high_credit", "target": "low_income", "label": "NO" },
+    { "source": "high_income", "target": "low_dti", "label": "YES" },
+    { "source": "high_income", "target": "high_dti", "label": "NO" },
+    { "source": "low_dti", "target": "approve_premium", "label": "YES" },
+    { "source": "low_dti", "target": "approve_standard", "label": "NO" },
+    { "source": "high_dti", "target": "approve_conditional", "label": "YES" },
+    { "source": "high_dti", "target": "manual_review", "label": "NO" },
+    { "source": "low_income", "target": "existing_yes", "label": "YES" },
+    { "source": "low_income", "target": "existing_no", "label": "NO" },
+    { "source": "low_credit", "target": "mid_credit", "label": "YES" },
+    { "source": "low_credit", "target": "very_low", "label": "NO" },
+    { "source": "mid_credit", "target": "collateral_yes", "label": "YES" },
+    { "source": "mid_credit", "target": "collateral_no", "label": "NO" },
+    { "source": "very_low", "target": "bankrupt", "label": "YES" },
+    { "source": "very_low", "target": "no_bankrupt", "label": "NO" }
+  ]
+}

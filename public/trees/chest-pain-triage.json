@@ -1,0 +1,108 @@
+{
+  "id": "root",
+  "label": "Does the patient present with acute chest pain?",
+  "type": "decision",
+  "children": [
+    {
+      "id": "ecg",
+      "label": "Does the 12-lead ECG show ST-segment elevation?",
+      "type": "decision",
+      "edgeLabel": "YES",
+      "children": [
+        {
+          "id": "stemi",
+          "label": "Is PCI-capable facility available within 120 minutes?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            { "id": "primary_pci", "label": "Activate Cath Lab for Primary PCI", "type": "leaf", "edgeLabel": "YES" },
+            {
+              "id": "no_pci",
+              "label": "Are there contraindications to fibrinolytic therapy?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "transfer", "label": "Arrange Emergent Transfer to PCI Centre", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "fibrinolysis", "label": "Administer Fibrinolytic Therapy Within 30 Minutes", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "no_ste",
+          "label": "Is the initial troponin elevated?",
+          "type": "decision",
+          "edgeLabel": "NO",
+          "children": [
+            {
+              "id": "trop_high",
+              "label": "Calculate GRACE risk score. Is the score > 140?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "high_grace", "label": "Urgent Invasive Strategy Within 24 Hours", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "low_grace", "label": "Serial Troponins and Monitored Bed Admission", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "trop_normal",
+              "label": "Does repeat troponin at 3 hours show a rising trend?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "rising", "label": "Admit for Observation and Cardiology Consult", "type": "leaf", "edgeLabel": "YES" },
+                {
+                  "id": "stable_trop",
+                  "label": "Is the HEART score ≥ 4?",
+                  "type": "decision",
+                  "edgeLabel": "NO",
+                  "children": [
+                    { "id": "heart_high", "label": "Stress Testing or CT Coronary Angiography", "type": "leaf", "edgeLabel": "YES" },
+                    { "id": "heart_low", "label": "Safe for Discharge with Outpatient Follow-Up", "type": "leaf", "edgeLabel": "NO" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "non_cardiac",
+      "label": "Are there features suggesting a non-cardiac cause?",
+      "type": "decision",
+      "edgeLabel": "NO",
+      "children": [
+        {
+          "id": "pe_suspect",
+          "label": "Is pulmonary embolism suspected? (Wells score ≥ 4)",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            { "id": "ctpa", "label": "Obtain CT Pulmonary Angiography", "type": "leaf", "edgeLabel": "YES" },
+            {
+              "id": "other_cause",
+              "label": "Is there pleuritic pain with fever?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "pneumonia", "label": "Chest X-Ray and Empiric Antibiotics if Indicated", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "msk", "label": "Consider Musculoskeletal or GI Cause", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dissection",
+          "label": "Is aortic dissection suspected? (Tearing pain, BP differential)",
+          "type": "decision",
+          "edgeLabel": "NO",
+          "children": [
+            { "id": "cta_aorta", "label": "Urgent CT Aortography and Surgical Consult", "type": "leaf", "edgeLabel": "YES" },
+            { "id": "reassess", "label": "Monitor Vitals, Serial ECG, and Reassess in 2 Hours", "type": "leaf", "edgeLabel": "NO" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "id": "root",
+  "label": "Does the patient meet SIRS criteria with suspected infection?",
+  "type": "decision",
+  "children": [
+    {
+      "id": "qsofa",
+      "label": "Is the qSOFA score ≥ 2?",
+      "type": "decision",
+      "edgeLabel": "YES",
+      "children": [
+        {
+          "id": "severe",
+          "label": "Is the serum lactate > 4 mmol/L?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            {
+              "id": "septic_shock",
+              "label": "Does hypotension persist after 30 mL/kg fluid bolus?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "vasopressors", "label": "Initiate Vasopressor Therapy (Norepinephrine First Line)", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "fluid_responsive", "label": "Continue Fluid Resuscitation and Reassess Hourly", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            {
+              "id": "lactate_mod",
+              "label": "Has lactate cleared by > 10% after initial resuscitation?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "clearing", "label": "Continue Current Management and Monitor q4h Lactate", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "not_clearing", "label": "Escalate Care: Consider ICU Admission", "type": "chance", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "low_qsofa",
+          "label": "Are blood cultures and initial labs drawn?",
+          "type": "decision",
+          "edgeLabel": "NO",
+          "children": [
+            {
+              "id": "cultures_done",
+              "label": "Has empiric antibiotic therapy been started within 1 hour?",
+              "type": "decision",
+              "edgeLabel": "YES",
+              "children": [
+                { "id": "abx_started", "label": "Reassess Clinical Status at 6 Hours", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "abx_delayed", "label": "Administer Broad-Spectrum Antibiotics Immediately", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            },
+            { "id": "draw_cultures", "label": "Obtain Blood Cultures x2 Before Antibiotics", "type": "leaf", "edgeLabel": "NO" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "no_sirs",
+      "label": "Is there clinical concern for infection despite normal SIRS?",
+      "type": "decision",
+      "edgeLabel": "NO",
+      "children": [
+        {
+          "id": "clinical_concern",
+          "label": "Is the patient immunocompromised?",
+          "type": "decision",
+          "edgeLabel": "YES",
+          "children": [
+            { "id": "immuno_yes", "label": "Low Threshold for Sepsis Workup and Empiric Treatment", "type": "leaf", "edgeLabel": "YES" },
+            {
+              "id": "immuno_no",
+              "label": "Is the source of infection identifiable?",
+              "type": "decision",
+              "edgeLabel": "NO",
+              "children": [
+                { "id": "source_found", "label": "Targeted Antibiotic Therapy and Source Control", "type": "leaf", "edgeLabel": "YES" },
+                { "id": "source_unknown", "label": "Broad Workup: CT, Urinalysis, Blood Cultures", "type": "leaf", "edgeLabel": "NO" }
+              ]
+            }
+          ]
+        },
+        { "id": "no_concern", "label": "Continue Monitoring and Standard Care", "type": "leaf", "edgeLabel": "NO" }
+      ]
+    }
+  ]
+}
