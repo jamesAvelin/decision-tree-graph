@@ -2,6 +2,8 @@
 
 A React component for visualizing decision trees and directed acyclic graphs. Supports three layout algorithms (compact, hierarchical, force-directed), interactive expand/collapse, search, zoom/pan, and smooth animations.
 
+![decision-tree-graph screenshot](docs/screenshot.png)
+
 ## Installation
 
 ```bash
