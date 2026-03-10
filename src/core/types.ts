@@ -1,4 +1,4 @@
-export type NodeType = 'decision' | 'leaf' | 'chance';
+export type NodeType = 'decision' | 'leaf' | 'chance' | 'clinical-state' | 'action' | 'link' | 'resource';
 export type LayoutMode = 'compact' | 'hierarchical' | 'force';
 export type Direction = 'TB' | 'LR';
 

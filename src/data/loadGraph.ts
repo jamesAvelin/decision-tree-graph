@@ -45,7 +45,8 @@ function flattenNestedTree(
 ) {
   const { width, height } = computeNodeDimensions(def.label);
   const children = def.children || [];
-  const nodeType: NodeType = (def.type === 'leaf' || def.type === 'chance') ? def.type : 'decision';
+  const validTypes: NodeType[] = ['decision', 'leaf', 'chance', 'clinical-state', 'action', 'link', 'resource'];
+    const nodeType: NodeType = validTypes.includes(def.type as NodeType) ? (def.type as NodeType) : 'decision';
 
   nodes.set(def.id, {
     id: def.id,

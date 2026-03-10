@@ -18,7 +18,7 @@ interface SvgNodeLayerProps {
 
 // Word-wrap text into lines that fit within maxWidth at a given font size
 function wrapText(text: string, maxWidth: number, fontSize: number): string[] {
-  const charWidth = fontSize * 0.55; // approximate average character width
+  const charWidth = fontSize * 0.55;
   const maxChars = Math.floor(maxWidth / charWidth);
   if (text.length <= maxChars) return [text];
 
@@ -37,6 +37,183 @@ function wrapText(text: string, maxWidth: number, fontSize: number): string[] {
   }
   if (current) lines.push(current);
   return lines;
+}
+
+/**
+ * Renders the shape outline for a node based on its type.
+ */
+function NodeShape({
+  w,
+  h,
+  type,
+  fill,
+  stroke,
+  strokeWidth,
+}: {
+  w: number;
+  h: number;
+  type: string;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}) {
+  switch (type) {
+    // Diamond shape for decision nodes
+    case 'decision': {
+      const cx = w / 2;
+      const cy = h / 2;
+      const points = [
+        `${cx},0`,
+        `${w},${cy}`,
+        `${cx},${h}`,
+        `0,${cy}`,
+      ].join(' ');
+      return (
+        <polygon
+          points={points}
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          strokeLinejoin="round"
+        />
+      );
+    }
+
+    // Pill / stadium shape for clinical state and link nodes
+    case 'clinical-state':
+    case 'link': {
+      const rx = h / 2;
+      return (
+        <rect
+          width={w}
+          height={h}
+          rx={rx}
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+        />
+      );
+    }
+
+    // Ellipse for resource nodes
+    case 'resource': {
+      return (
+        <ellipse
+          cx={w / 2}
+          cy={h / 2}
+          rx={w / 2}
+          ry={h / 2}
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+        />
+      );
+    }
+
+    // Sharp rectangle for action / leaf nodes
+    case 'action':
+    case 'leaf': {
+      return (
+        <rect
+          width={w}
+          height={h}
+          rx={3}
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+        />
+      );
+    }
+
+    // Rounded rectangle for chance and default
+    case 'chance':
+    default: {
+      return (
+        <rect
+          width={w}
+          height={h}
+          rx={6}
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+        />
+      );
+    }
+  }
+}
+
+/**
+ * Renders the shadow for a node shape.
+ */
+function NodeShadow({ w, h, type }: { w: number; h: number; type: string }) {
+  switch (type) {
+    case 'decision': {
+      const cx = w / 2;
+      const cy = h / 2;
+      const points = [
+        `${cx},3`,
+        `${w},${cy + 3}`,
+        `${cx},${h + 3}`,
+        `0,${cy + 3}`,
+      ].join(' ');
+      return (
+        <polygon
+          points={points}
+          fill="rgba(0,0,0,0.1)"
+          filter="url(#shadowBlur)"
+        />
+      );
+    }
+
+    case 'clinical-state':
+    case 'link': {
+      return (
+        <rect
+          x={0} y={3}
+          width={w} height={h}
+          rx={h / 2}
+          fill="rgba(0,0,0,0.1)"
+          filter="url(#shadowBlur)"
+        />
+      );
+    }
+
+    case 'resource': {
+      return (
+        <ellipse
+          cx={w / 2} cy={h / 2 + 3}
+          rx={w / 2} ry={h / 2}
+          fill="rgba(0,0,0,0.1)"
+          filter="url(#shadowBlur)"
+        />
+      );
+    }
+
+    case 'action':
+    case 'leaf': {
+      return (
+        <rect
+          x={0} y={3}
+          width={w} height={h}
+          rx={3}
+          fill="rgba(0,0,0,0.1)"
+          filter="url(#shadowBlur)"
+        />
+      );
+    }
+
+    default: {
+      return (
+        <rect
+          x={0} y={3}
+          width={w} height={h}
+          rx={6}
+          fill="rgba(0,0,0,0.1)"
+          filter="url(#shadowBlur)"
+        />
+      );
+    }
+  }
 }
 
 const NodeComponent = memo(function NodeComponent({
@@ -122,9 +299,10 @@ const NodeComponent = memo(function NodeComponent({
   const strokeWidth = isHovered || isHighlighted || isSearchMatch ? 2 : 1;
   const bgColor = isHovered ? '#d5f3fa' : defaultBg;
 
-  // Wrap label text
+  // Tighter text padding for diamonds and ellipses
   const fontSize = 14;
-  const lines = wrapText(node.label, w - 32, fontSize);
+  const textPad = (node.type === 'decision' || node.type === 'resource') ? 64 : 32;
+  const lines = wrapText(node.label, w - textPad, fontSize);
   const lineHeight = fontSize * 1.4;
   const textBlockHeight = lines.length * lineHeight;
   const textStartY = (h - textBlockHeight) / 2 + fontSize;
@@ -137,22 +315,14 @@ const NodeComponent = memo(function NodeComponent({
       onMouseDown={handleMouseDown}
       style={{ cursor: 'pointer', pointerEvents: 'auto' }}
     >
-      {/* Shadow (shadow-lg) */}
-      <rect
-        x={0}
-        y={3}
-        width={w}
-        height={h}
-        rx={6}
-        fill="rgba(0,0,0,0.1)"
-        filter="url(#shadowBlur)"
-      />
+      {/* Shadow */}
+      <NodeShadow w={w} h={h} type={node.type} />
 
       {/* Node body */}
-      <rect
-        width={w}
-        height={h}
-        rx={6}
+      <NodeShape
+        w={w}
+        h={h}
+        type={node.type}
         fill={bgColor}
         stroke={borderColor}
         strokeWidth={strokeWidth}
