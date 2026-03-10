@@ -172,6 +172,21 @@ export function computeCompactLayout(
     assignPositions(rootId, 0, 0, nodes, subtreeWidths, positions, effectiveMaxWidth);
   }
 
+  // Handle nodes not reachable from root's children walk (DAG with multiple parents)
+  if (positions.size < nodes.size) {
+    let maxY = 0;
+    for (const pos of positions.values()) {
+      maxY = Math.max(maxY, pos.y);
+    }
+    for (const [id, node] of nodes) {
+      if (!positions.has(id)) {
+        computeSubtreeWidths(id, nodes, subtreeWidths, effectiveMaxWidth);
+        maxY += VERTICAL_GAP + node.height;
+        assignPositions(id, 0, maxY, nodes, subtreeWidths, positions, effectiveMaxWidth);
+      }
+    }
+  }
+
   if (direction === 'LR') {
     rotateToLR(positions);
   }

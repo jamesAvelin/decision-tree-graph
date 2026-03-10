@@ -43,6 +43,17 @@ export function GraphRenderer({ onNodeClick, nodeColorMap }: GraphRendererProps)
 
   const visibleNodes = useMemo(() => {
     if (!rootId) return [];
+
+    // Fast path: if no node is collapsed, all nodes are visible
+    let anyCollapsed = false;
+    for (const node of nodes.values()) {
+      if (node.collapsed) { anyCollapsed = true; break; }
+    }
+    if (!anyCollapsed) {
+      return Array.from(nodes.values());
+    }
+
+    // Walk from root, skipping children of collapsed nodes
     const visible = new Set<string>();
     const queue = [rootId];
     while (queue.length > 0) {

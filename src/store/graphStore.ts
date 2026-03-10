@@ -32,6 +32,16 @@ interface GraphState {
 }
 
 function getVisibleNodeIds(nodes: Map<string, GraphNode>, rootId: string): Set<string> {
+  // Fast path: if no node is collapsed, all nodes are visible
+  let anyCollapsed = false;
+  for (const node of nodes.values()) {
+    if (node.collapsed) { anyCollapsed = true; break; }
+  }
+  if (!anyCollapsed) {
+    return new Set(nodes.keys());
+  }
+
+  // Walk from root, skipping children of collapsed nodes
   const visible = new Set<string>();
   const queue = [rootId];
   while (queue.length > 0) {

@@ -35,5 +35,39 @@ export function assignLayers(
     }
   }
 
+  // Handle nodes not reachable from root (disconnected DAG components)
+  // Use edge-based BFS for any remaining unvisited nodes
+  if (layers.size < nodes.size) {
+    const edgeTargets = new Map<string, string[]>();
+    for (const edge of edges) {
+      if (!edgeTargets.has(edge.source)) edgeTargets.set(edge.source, []);
+      edgeTargets.get(edge.source)!.push(edge.target);
+    }
+
+    // Find unvisited nodes that have a visited parent via edges
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const node of nodes.values()) {
+        if (layers.has(node.id)) continue;
+        // Check if any edge source pointing to this node has been layered
+        for (const edge of edges) {
+          if (edge.target === node.id && layers.has(edge.source)) {
+            layers.set(node.id, layers.get(edge.source)! + 1);
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // Any still-unreachable nodes get placed at layer 0
+    for (const node of nodes.values()) {
+      if (!layers.has(node.id)) {
+        layers.set(node.id, 0);
+      }
+    }
+  }
+
   return layers;
 }

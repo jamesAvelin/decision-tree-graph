@@ -47,7 +47,16 @@ export const DecisionTree = forwardRef<DecisionTreeRef, DecisionTreeProps>(
       if (data !== undefined) {
         try {
           const { nodes: parsedNodes, edges, rootId } = parseGraphJson(data);
+          // Debug: log collapsed states
+          const collapsedNodes = Array.from(parsedNodes.values()).filter(n => n.collapsed);
+          console.log('[DecisionTree] parsed:', parsedNodes.size, 'nodes,', edges.length, 'edges, rootId:', rootId, 'collapsed:', collapsedNodes.length);
           setGraphData(parsedNodes, edges, rootId);
+          // Debug: log store state after set
+          setTimeout(() => {
+            const storeNodes = useGraphStore.getState().nodes;
+            const storeCollapsed = Array.from(storeNodes.values()).filter(n => n.collapsed);
+            console.log('[DecisionTree] store after setGraphData:', storeNodes.size, 'nodes, collapsed:', storeCollapsed.length, storeCollapsed.map(n => n.id));
+          }, 50);
           setLoading(false);
           setError(null);
         } catch (err) {
