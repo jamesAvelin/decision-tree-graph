@@ -7,7 +7,7 @@ export interface CompactResult {
 }
 
 const NODE_GAP = 30;     // horizontal gap between sibling subtrees
-const VERTICAL_GAP = 60; // vertical gap between parent bottom and child top
+const VERTICAL_GAP = 29; // vertical gap between parent bottom and child top
 
 /**
  * Phase 1: Bottom-up DFS to compute the width each subtree needs.

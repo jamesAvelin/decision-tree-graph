@@ -23,6 +23,8 @@ export interface DecisionTreeProps {
   onNodeClick?: (nodeId: string, nodeData?: Record<string, unknown>) => void;
   /** Custom node colors keyed by node.type or node.data.colorKey */
   nodeColorMap?: Record<string, NodeColorConfig>;
+  /** Hide the built-in search bar and toolbar (useful when the host app provides its own) */
+  hideControls?: boolean;
 }
 
 export interface DecisionTreeRef {
@@ -35,7 +37,7 @@ export interface DecisionTreeRef {
 }
 
 export const DecisionTree = forwardRef<DecisionTreeRef, DecisionTreeProps>(
-  function DecisionTree({ src, data, className, style, onNodeClick, nodeColorMap }, ref) {
+  function DecisionTree({ src, data, className, style, onNodeClick, nodeColorMap, hideControls }, ref) {
     const setGraphData = useGraphStore((s) => s.setGraphData);
     const setHighlightedNodeId = useGraphStore((s) => s.setHighlightedNodeId);
     const toggleCollapse = useGraphStore((s) => s.toggleCollapse);
@@ -157,8 +159,8 @@ export const DecisionTree = forwardRef<DecisionTreeRef, DecisionTreeProps>(
     return (
       <div className={className} style={containerStyle}>
         <GraphRenderer onNodeClick={onNodeClick} nodeColorMap={nodeColorMap} />
-        <SearchBar />
-        <Toolbar />
+        {!hideControls && <SearchBar />}
+        {!hideControls && <Toolbar />}
       </div>
     );
   }
