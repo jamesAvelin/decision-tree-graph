@@ -7,6 +7,7 @@ import type { GraphNode } from '../core/types';
 import { LayoutScheduler } from '../core/LayoutScheduler';
 import { CanvasEdgeLayer } from './CanvasEdgeLayer';
 import { SvgNodeLayer } from './SvgNodeLayer';
+import { SvgEdgeLabelLayer } from './SvgEdgeLabelLayer';
 import { MiniMap } from './MiniMap';
 import { Tooltip } from './Tooltip';
 
@@ -395,6 +396,14 @@ export function GraphRenderer({ onNodeClick, nodeColorMap }: GraphRendererProps)
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           nodeColorMap={nodeColorMap}
+        />
+        <SvgEdgeLabelLayer
+          edges={visibleEdges}
+          nodes={nodes}
+          transform={activeTransform}
+          width={dimensions.width}
+          height={contentHeight}
+          hoveredEdgeId={hoveredEdgeId}
         />
       </div>
 

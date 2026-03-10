@@ -11,48 +11,6 @@ interface CanvasEdgeLayerProps {
   searchQuery: string;
 }
 
-/**
- * Place label at the midpoint of the total edge path length.
- * This positions labels between nodes rather than near the source where
- * they can be hidden behind node rectangles (canvas renders below SVG nodes).
- */
-function findLabelPosition(points: [number, number][]): { x: number; y: number } {
-  if (points.length < 2) {
-    const p = points[0] || [0, 0];
-    return { x: p[0], y: p[1] };
-  }
-
-  // Compute total path length
-  let totalLen = 0;
-  for (let i = 0; i < points.length - 1; i++) {
-    const dx = points[i + 1][0] - points[i][0];
-    const dy = points[i + 1][1] - points[i][1];
-    totalLen += Math.sqrt(dx * dx + dy * dy);
-  }
-
-  // Walk to the midpoint
-  let remaining = totalLen / 2;
-  for (let i = 0; i < points.length - 1; i++) {
-    const dx = points[i + 1][0] - points[i][0];
-    const dy = points[i + 1][1] - points[i][1];
-    const len = Math.sqrt(dx * dx + dy * dy);
-    if (len === 0) continue;
-    if (remaining <= len) {
-      const t = remaining / len;
-      return {
-        x: points[i][0] + t * dx,
-        y: points[i][1] + t * dy,
-      };
-    }
-    remaining -= len;
-  }
-
-  // Fallback: midpoint of first and last point
-  const first = points[0];
-  const last = points[points.length - 1];
-  return { x: (first[0] + last[0]) / 2, y: (first[1] + last[1]) / 2 };
-}
-
 export function CanvasEdgeLayer({
   edges,
   nodes,
@@ -127,46 +85,7 @@ export function CanvasEdgeLayer({
       ctx.closePath();
       ctx.fill();
 
-      // Edge label — positioned at midpoint of edge, offset above the line
-      if (edge.label) {
-        const pos = findLabelPosition(edge.points);
-        const lx = pos.x;
-        const ly = pos.y - 12; // slightly above the midpoint
-
-        ctx.font = '600 11px Inter, ui-sans-serif, system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        const textWidth = ctx.measureText(edge.label).width;
-        const padX = 6;
-        const padY = 4;
-        const rx = lx - textWidth / 2 - padX;
-        const ry = ly - 7 - padY;
-        const rw = textWidth + padX * 2;
-        const rh = 14 + padY * 2;
-        const radius = 4;
-
-        // Rounded white background with subtle border
-        ctx.beginPath();
-        ctx.moveTo(rx + radius, ry);
-        ctx.lineTo(rx + rw - radius, ry);
-        ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
-        ctx.lineTo(rx + rw, ry + rh - radius);
-        ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
-        ctx.lineTo(rx + radius, ry + rh);
-        ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
-        ctx.lineTo(rx, ry + radius);
-        ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
-        ctx.closePath();
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.fillStyle = isHovered ? '#0891b2' : '#374151';
-        ctx.fillText(edge.label, lx, ly);
-      }
+      // Edge labels are rendered in SvgEdgeLabelLayer (above node layer)
     }
 
     ctx.restore();
