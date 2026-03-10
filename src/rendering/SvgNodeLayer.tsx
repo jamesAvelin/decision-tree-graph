@@ -1,5 +1,6 @@
 import { memo, useCallback } from 'react';
 import type { GraphNode } from '../core/types';
+import type { NodeColorConfig } from '../DecisionTree';
 
 interface SvgNodeLayerProps {
   nodes: GraphNode[];
@@ -12,6 +13,7 @@ interface SvgNodeLayerProps {
   onDragStart: (id: string, x: number, y: number) => void;
   onDragMove: (id: string, x: number, y: number) => void;
   onDragEnd: (id: string) => void;
+  nodeColorMap?: Record<string, NodeColorConfig>;
 }
 
 // Word-wrap text into lines that fit within maxWidth at a given font size
@@ -45,6 +47,7 @@ const NodeComponent = memo(function NodeComponent({
   onHover,
   onClick,
   onDragStart,
+  colorConfig,
 }: {
   node: GraphNode;
   isHovered: boolean;
@@ -53,6 +56,7 @@ const NodeComponent = memo(function NodeComponent({
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
   onDragStart: (id: string, x: number, y: number) => void;
+  colorConfig?: NodeColorConfig;
 }) {
   const hasChildren = node.children.length > 0;
 
@@ -106,14 +110,17 @@ const NodeComponent = memo(function NodeComponent({
   const x = node.x - w / 2;
   const y = node.y - h / 2;
 
+  const defaultBg = colorConfig?.bg ?? '#e1f8fd';
+  const defaultBorder = colorConfig?.border ?? '#83d6e8';
+
   const borderColor = isHighlighted || isSearchMatch
     ? '#f59e0b'
     : isHovered
       ? '#0891b2'
-      : '#83d6e8';
+      : defaultBorder;
 
   const strokeWidth = isHovered || isHighlighted || isSearchMatch ? 2 : 1;
-  const bgColor = isHovered ? '#d5f3fa' : '#e1f8fd';
+  const bgColor = isHovered ? '#d5f3fa' : defaultBg;
 
   // Wrap label text
   const fontSize = 14;
@@ -220,6 +227,7 @@ export function SvgNodeLayer({
   onDragStart,
   onDragMove,
   onDragEnd,
+  nodeColorMap,
 }: SvgNodeLayerProps) {
   const handleCustomDrag = useCallback((e: Event) => {
     const detail = (e as CustomEvent).detail;
@@ -265,6 +273,10 @@ export function SvgNodeLayer({
           const isSearchMatch = searchQuery !== '' &&
             node.label.toLowerCase().includes(searchQuery.toLowerCase());
 
+          // Resolve color: try node.data.colorKey first, then node.type
+          const colorKey = (node.data?.colorKey as string) ?? node.type;
+          const resolvedColor = nodeColorMap?.[colorKey] ?? nodeColorMap?.[node.type];
+
           return (
             <NodeComponent
               key={node.id}
@@ -275,6 +287,7 @@ export function SvgNodeLayer({
               onHover={onNodeHover}
               onClick={onNodeClick}
               onDragStart={onDragStart}
+              colorConfig={resolvedColor}
             />
           );
         })}

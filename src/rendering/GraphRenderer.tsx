@@ -10,7 +10,14 @@ import { SvgNodeLayer } from './SvgNodeLayer';
 import { MiniMap } from './MiniMap';
 import { Tooltip } from './Tooltip';
 
-export function GraphRenderer() {
+import type { NodeColorConfig } from '../DecisionTree';
+
+interface GraphRendererProps {
+  onNodeClick?: (nodeId: string, nodeData?: Record<string, unknown>) => void;
+  nodeColorMap?: Record<string, NodeColorConfig>;
+}
+
+export function GraphRenderer({ onNodeClick, nodeColorMap }: GraphRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const schedulerRef = useRef<LayoutScheduler | null>(null);
   const zoomRef = useRef<ZoomBehavior<HTMLDivElement, unknown> | null>(null);
@@ -366,10 +373,17 @@ export function GraphRenderer() {
           highlightedNodeId={highlightedNodeId}
           searchQuery={searchQuery}
           onNodeHover={setHoveredNodeId}
-          onNodeClick={toggleCollapse}
+          onNodeClick={(nodeId: string) => {
+            toggleCollapse(nodeId);
+            if (onNodeClick) {
+              const node = nodes.get(nodeId);
+              onNodeClick(nodeId, node?.data);
+            }
+          }}
           onDragStart={handleDragStart}
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
+          nodeColorMap={nodeColorMap}
         />
       </div>
 

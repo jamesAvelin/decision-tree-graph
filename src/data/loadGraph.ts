@@ -45,7 +45,6 @@ function flattenNestedTree(
 ) {
   const { width, height } = computeNodeDimensions(def.label);
   const children = def.children || [];
-  const hasChildren = children.length > 0;
   const nodeType: NodeType = (def.type === 'leaf' || def.type === 'chance') ? def.type : 'decision';
 
   nodes.set(def.id, {
@@ -57,7 +56,7 @@ function flattenNestedTree(
     x: 0, y: 0, tx: 0, ty: 0,
     width,
     height,
-    collapsed: hasChildren && depth >= 1,
+    collapsed: false,
     data: def.data,
   });
 
@@ -140,8 +139,6 @@ function parseFlatGraph(json: FlatGraphJson): { nodes: Map<string, GraphNode>; e
   for (const n of json.nodes) {
     const { width, height } = computeNodeDimensions(n.label);
     const children = childrenMap.get(n.id) || [];
-    const hasChildren = children.length > 0;
-    const depth = depthMap.get(n.id) ?? 0;
     const nodeType: NodeType = (n.type === 'leaf' || n.type === 'chance') ? n.type : 'decision';
 
     nodes.set(n.id, {
@@ -153,7 +150,7 @@ function parseFlatGraph(json: FlatGraphJson): { nodes: Map<string, GraphNode>; e
       x: 0, y: 0, tx: 0, ty: 0,
       width,
       height,
-      collapsed: hasChildren && depth >= 1,
+      collapsed: false,
       data: n.data,
     });
   }
